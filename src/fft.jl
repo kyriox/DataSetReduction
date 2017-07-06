@@ -223,23 +223,28 @@ end
 function approx_maxmin(vbows,centers,ind,index,findex)
     res=PriorityQueue(Int64,Float64)
     println(">>>>>> Length: ", length(index.db))
+    println(centers)
     if length(centers)==1
         kfn, N = find_neighborhood(findex, vbows[centers[1]])
-        res[first(kfn).objID]=first(kfn).dist
+        res[first(kfn).objID]=-first(kfn).dist
     else
+        visited=Set()
         for c in centers
             kfn, Nf = find_neighborhood(findex, vbows[c])
             for fn in kfn
-                knn, N = find_neighborhood(index, vbows[ind[fn.objID]])
-                println("Furthes ids: ", Nf,"\n","Nearest ids: ", length(knn))
-                for nn in knn
-                    k,dist=nn.objID,nn.dist
-                    if k in keys(res)
-                        res[k] = abs(res[k])<dist ? res[k] : -dist 
-                    else
-                        res[k]=-dist
+                if !(fn.objID in visited)
+                    knn, N = find_neighborhood(index, vbows[ind[fn.objID]])
+                    for nn in knn
+                        k,dist=nn.objID,nn.dist
+                        if k in keys(res)
+                            res[k] = abs(res[k])<dist ? res[k] : -dist 
+                        else
+                            res[k]=-dist
+                        end
                     end
+                    push!(visited,fn.objID)
                 end
+                
             end
         end
     end
