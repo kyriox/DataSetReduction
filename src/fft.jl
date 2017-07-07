@@ -13,8 +13,17 @@ function set_oracle(index, fastlinks::Dict{UInt64,KnnResult})
                 end
             end
         end
+
+        if length(L) == 0
+            # just link randomly for orthogonal vectors
+            n = length(index.db)
+            return rand(1:n, floor(Int, log2(n+1)))
+        end
+
+        # @show L, fastlinks
         L
     end
+
     index.options.oracle = oracle
     fastlinks
 end
