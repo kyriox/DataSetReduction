@@ -228,27 +228,22 @@ function approx_maxmin(vbows,centers,ind,index,findex)
         kfn, N = find_neighborhood(findex, vbows[centers[1]])
         res[first(kfn).objID]=-first(kfn).dist
     else
-        visited=Set()
-        for c in centers
-            kfn, Nf = find_neighborhood(findex, vbows[c])
-            for fn in kfn
-                if !(fn.objID in visited)
-                    knn, N = find_neighborhood(index, vbows[ind[fn.objID]])
-                    for nn in knn
-                        k,dist=nn.objID,nn.dist
-                        if k in keys(res)
-                            res[k] = abs(res[k])<dist ? res[k] : -dist 
-                        else
-                            res[k]=-dist
-                        end
+        c=last(centers)
+        kfn, Nf = find_neighborhood(findex, vbows[c])
+        for fn in kfn
+            if !(ind[fn.objID] in centers)
+                knn, N = find_neighborhood(index, vbows[ind[fn.objID]])
+                for nn in knn
+                    k,dist=nn.objID,nn.dist
+                    if k in keys(res)
+                        res[k] = abs(res[k])<dist ? res[k] : -dist 
+                    else
+                        res[k]=-dist
                     end
-                    push!(visited,fn.objID)
                 end
-                
-            end
+            end    
         end
     end
-    println(">>>>>>>>>>>> ",res)
     fnid,d=peek(res)
     while ind[fnid] in centers
         dequeue!(res)
