@@ -28,20 +28,23 @@ function update_oracle(index, fastlinks, bow::VBOW, num_fast_links)
     end
 end
 
-function create_index(config, distance_fucntion=angle_distance)
-    index = LocalSearchIndex(VBOW, distance_fucntion, recall=0.90, neighborhood=LogSatNeighborhood(1.5))
+function create_index(config, distance_function=angle_distance)
+    recall=parse(Float64, get(ENV, "recall", "0.90"))
+    index = LocalSearchIndex(VBOW, distance_function, recall=recall, neighborhood=LogNeighborhood(1.2))
+    index.options.verbose = parse(Bool, get(ENV, "verbose_index", "false"))
     fastlinks = set_oracle(index, Dict{UInt64,KnnResult}())
     return index, fastlinks
 end
 
 function full_index(vbows, ind, config, num_fast_links)
-    index,fastlinks=create_index(config, cosine)
+    index, fastlinks=create_index(config, cosine)
     for i  in ind
         vbow=vbows[i]
         knn, N = find_neighborhood(index, vbow)
         push_neighborhood!(index, vbow, N, length(index.db))
         update_oracle(index, fastlinks, vbow, num_fast_links)
     end
+
     return index, fastlinks
 end
 
@@ -54,7 +57,7 @@ function savedb(DBR, dst)
     end
 end
 
-function list_of_items(filename,key,config) 
+function list_of_items(filename,key,config)
     tweets=[]
     bows=[]
     vbows=[]
@@ -83,7 +86,7 @@ function assign(vbows,partitions,centers,ind)
         for i in ind
             dist=sort([(angle_distance(vbows[c],vbows[i]),c) for c in centers])
             partitions[i]=dist[1][2]
-        end        
+        end
     end
 end
 
@@ -125,7 +128,7 @@ end
 function maxmin(vbows,centers,ind,index::KnnResult)
     c=last(centers)
     if length(index)==0
-        for i in ind 
+        for i in ind
             if i!=c
                 push!(index,i,Inf)
             end
@@ -135,7 +138,7 @@ function maxmin(vbows,centers,ind,index::KnnResult)
     for fn in index
         #if !(fn.objID in centers)
         dist=angle_distance(vbows[fn.objID],vbows[c])
-        dist = if (dist<fn.dist) dist else fn.dist end 
+        dist = if (dist<fn.dist) dist else fn.dist end
         if fn.objID!=c
             push!(nindex,fn.objID,dist)
         end
@@ -158,7 +161,7 @@ function fcentroid(vbows,centers,partitions,ind)
     while fid in centers
         i=i+1
         fid,d=dist[i][2],dist[i][1]
-    end 
+    end
     return fid,d
 end
 
@@ -171,7 +174,7 @@ function toDict(tweets, centers, partitions, key)
         #twk[key]=[]
         DBR[k]=twk
     end
-    #Group elements in the same group 
+    #Group elements in the same group
     # for (i,v) in enumerate(partitions)
     #     k=findfirst(partitions, v)
     #     push!(DBR[k][key],tweets[i][key])
@@ -181,7 +184,7 @@ end
 
 function ncenters(num_of_centers,ind)
     if num_of_centers=="log"
-        noc=trunc(log(2,length(ind))) 
+        noc=trunc(log(2,length(ind)))
     elseif num_of_centers=="sqrt"
         noc=trunc(sqrt(length(ind)))
     else
@@ -237,14 +240,14 @@ function approx_maxmin(vbows,centers,ind,index,findex)
                     for nn in knn
                         k,dist=nn.objID,nn.dist
                         if k in keys(res)
-                            res[k] = abs(res[k])<dist ? res[k] : -dist 
+                            res[k] = abs(res[k])<dist ? res[k] : -dist
                         else
                             res[k]=-dist
                         end
                     end
                     push!(visited,fn.objID)
                 end
-                
+
             end
         end
     end
@@ -300,7 +303,7 @@ end
 
 # if length(ARGS) == 0
 #     info("""
-#     fttc.jl clusters elements using furthest firts travel algorithm  
+#     fttc.jl clusters elements using furthest firts travel algorithm
 
 #     Usage: [environment-variables] julia fftc.jl file...
 
@@ -311,15 +314,15 @@ end
 #     - key: the keyword containing the text for each json
 #        default: text
 
-#     - num_of_centers: the number of furthest neighbor used as centers (per class). 
+#     - num_of_centers: the number of furthest neighbor used as centers (per class).
 #        could be any of log, sqrt or an interger n (0<=n, 0 is equivalent to do rocchio).
-#        default: log to indicated that look for log(N) centers, where N is the number 
+#        default: log to indicated that look for log(N) centers, where N is the number
 #                 of samples in the input file
 #     - dst: file name to store founded  centers
 #       default:ouput.json
 #     - selection: Criterio used to select the fursthes neigboor, could be any of
-#         by partition furthest neighbor (partition) , furthest from centroid(centroid) or maximal min furthest 
-#         from the already selected heads (maxmin). The two first optios are per partiorion; the 
+#         by partition furthest neighbor (partition) , furthest from centroid(centroid) or maximal min furthest
+#         from the already selected heads (maxmin). The two first optios are per partiorion; the
 #         last one is global"""
 
 #          )
@@ -327,7 +330,7 @@ end
 #     for filename in ARGS
 #         main(
 #             filename,
-# 	    get(ENV, "dst", "output.json"),	
+# 	    get(ENV, "dst", "output.json"),
 #             get(ENV, "key", "text"),
 #             get(ENV, "num_of_centers", "log"),
 #             get(ENV, "selection", "partition")
