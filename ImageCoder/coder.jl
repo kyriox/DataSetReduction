@@ -124,7 +124,7 @@ function approximation_l1(xo,xm,beta=0.01)
     return sqrt(d(xo,xm)+beta*beta)
 end
 
-function german_maclure(xo,xm)
+function geman_mcclure(xo,xm)
     d=L2SquaredDistance()
     dd=d(xo,xm)
     return dd/(2+2*dd)
