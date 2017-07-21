@@ -4,19 +4,19 @@ using JLD
 function main(filename,dst,num_of_centers,kernel)
     Kernels=Dict("gaussian"=> gaussian, "linear"=>linear, 
                  "approximation_l1"=>approximation_l1,
-                 "german_maclure" => german_maclure,"l1ml2"=>l1_l2)
+                 "geman_mcclure" => geman_mcclure,"l1ml2"=>l1_l2)
     vbows,A,Y=load_csv(filename)
-    centers,dists,partitions=fft(vbows,Y,num_of_centers)
-    Xm,Xc=center_points(vbows,partitions,centers)
+    #centers,dists,partitions=fft(vbows,Y,num_of_centers)
+    #Xm,Xc=center_points(vbows,partitions,centers)
     #println("-> ",length(Xr))
     #println("=> ",length(Xr[1]))
-    JLD.save("codebook.$num_of_centers.jld","centroids",Xm,"centers",Xc )
-    #data=JLD.load("codebook.sqrt.jld")
-    #Xm,Xc=data["centroids"],data["centers"]
-    #Xrm=gen_features(vbows,Xm,Kernels[kernel])
-    #Xrc=gen_features(vbows,Xc,Kernels[kernel])
-    #savedb(Xrc,A,"data/centros.sqrt.$kernel.$dst")
-    #savedb(Xrm,A,"data/centroides.sqrt.$kernel.$dst")
+    #JLD.save("codebook.$num_of_centers.jld","centroids",Xm,"centers",Xc )
+    data=JLD.load("codebook.sqrt.jld")
+    Xm,Xc=data["centroids"],data["centers"]
+    Xrm=gen_features(vbows,Xm,Kernels[kernel])
+    Xrc=gen_features(vbows,Xc,Kernels[kernel])
+    savedb(Xrc,A,"data/centros.sqrt.$kernel.$dst")
+    savedb(Xrm,A,"data/centroides.sqrt.$kernel.$dst")
 end
 
 
