@@ -20,7 +20,7 @@ def cosine_similarity(a,b):
 
 def cosine_distance(a,b):
     return 1-a.dot(b)/(sqrt(a.mul(a).sum())*sqrt(b.mul(b).sum()))
-    
+
 def load(source):
     R,X=get_data(source)
     if 'klass' in R[0]:
@@ -52,10 +52,10 @@ def center_point(X):
     for i in range(N):
         r=0
         for j in range(N):
-           r+=cosine_similarity(X[i],X[j]) 
+           r+=cosine_similarity(X[i],X[j])
         R[i]=(r,i,X[i])
     return max(R)[-1]
-    
+
 center_function={'centroid':centroid,
                   'center_point':center_point,
                  'max_cord':max_cord}
@@ -262,7 +262,7 @@ def basic_e_nets(X,Y,eps=0.01, per_class=True, c_func='centroid'):
     #    Xr,Yr=group_elements(X,Y,partitions)
     #else:
     Xg,Yg=group_elements(X,Y,partitions)
-    return osc(Xg,Yg,c_func) 
+    return osc(Xg,Yg,c_func)
 
 def distance_matrices(X,Y):
     M=[]
@@ -274,7 +274,7 @@ def distance_matrices(X,Y):
 
 def density_nets(X,Y,k,M, c_func='centroid'):
     partitions=[-1 for x in X]
-    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]    
+    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]
     #M= M if M else distance_matrices(X,Y)
     for ind  in indices:
         lind=ind[:]
@@ -293,13 +293,13 @@ def density_nets(X,Y,k,M, c_func='centroid'):
     #print(partitions.count(-1))
     Xg,Yg=group_elements(X,Y,partitions)
     #print(partitions.count(-1))
-    return _prepare(Xg,Yg,'centroid')    
+    return _prepare(Xg,Yg,'centroid')
 
 from collections import OrderedDict as sset
 def cnn(X,Y,M,c_func='centroid'):
     partitions=[-1 for x in X]
     Xr,Yr,S,sl,=[],[],sset.fromkeys([]),0
-    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]    
+    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]
     for ind in indices:
         k=random.choice(ind)
         Xr.append(X[k])
@@ -339,10 +339,10 @@ def rnn(X,Y,M):
     Xr=[X[i] for i in S]
     Yr=[Y[i] for i in S]
     return Xr,Yr,S
-    
+
 def density_enets(X,Y,k,M=[], c_func='centroid'):
     partitions=[-1 for x in X]
-    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]    
+    indices=[[i for i in range(len(X)) if Y[i]==l] for l in set(Y)]
     #M = M if M else distance_matrices(X,Y)
     #print("Inicilizacion completa")
     for ind in indices:
@@ -372,7 +372,7 @@ def density_enets(X,Y,k,M=[], c_func='centroid'):
     #print(partitions)
     #print('yyyyy',Mi)
     Xg,Yg=group_elements(X,Y,partitions)
-    return _prepare(Xg,Yg,c_func='centroid')    
+    return _prepare(Xg,Yg,c_func='centroid')
 
 import math
 from sklearn.metrics import f1_score
@@ -467,7 +467,7 @@ def _assign_prototype(X,C):
     #print(partitions)
     #Xi=[X[i] for i,l in enumerate(partitions) if l!=-1]
     return np.array([max([(cosine_similarity(x,v[0]), i) for i,v in C.items()])[1] for x in X])
-    
+
 
 def _centroids(X,Y):
     C={}
@@ -475,7 +475,7 @@ def _centroids(X,Y):
         indices=[j for j,y in enumerate(Y) if l==y]
         Xi =[X[i] for i in indices]
         C[ci]=(centroid(Xi),l)
-    return C    
+    return C
 
 def _divide(X,Xs,xm,indices):
     Xl=Xs[indices,:]
@@ -576,9 +576,9 @@ def sgp(X,Y,c_func='centroid'):
             _update_group(G,X,k,indk,lk)
             _update_groups(X,Y,G,indj,lk)
             nc=1
-        print(k,im,nc, not(q.empty()), im<len(X)) 
+        print(k,im,nc, not(q.empty()), im<len(X))
     return G
-    
+
 def test_svm(C,Y,source,dest):
     le = preprocessing.LabelEncoder()
     le.fit(list(set(Y)))
@@ -608,15 +608,15 @@ def test_svm(C,Y,source,dest):
         S[-1]['text']=R[i]['text']
         S[-1]['klass']=P[i]
     S[-1]['datasize']=len(C)
-    open(dest,'w').write("%s" % "\n ".join(json.dumps(r) for r in S))    
+    open(dest,'w').write("%s" % "\n ".join(json.dumps(r) for r in S))
     return P
-    
+
 
 #def set_size(source):
 #    f=open(source,'r')
 #    txt=f.readlines()[0]
 #    f.close()
-#    R=json.loads(txt)    
+#    R=json.loads(txt)
 #    R['traninig_set_size']=0
 #    open(source,'w').write("%s" % "\n ".join(json.dumps(r) for r in [R]))
 
@@ -649,7 +649,7 @@ def ppdist(X,n_proc=32):
     #pickle.dump(res,f)
     #np.save(f,res)
 
-    
+
 def distribute(X,n_proc):
     n=len(X)
     total=int(n*(n+1)/2-n)
@@ -723,7 +723,7 @@ def chunks(X, n):
     for i in range(0, len(X), n):
         L.append(X[i:i + n])
     return L
-    
+
 
 if  __name__=='__main__':
 
@@ -760,7 +760,7 @@ if  __name__=='__main__':
                 Yt=Yt+Yep
             print("Termine %s chunk de: %s, agregue %s instancias (eps:%s)" %(clave,len(indices), len(Yep),eps))
         test_svm(X,Y,ftest,Xt,Yt,'enets/tass.predicte.enets-%(eps)s.json' %locals())
-    
+
 
 
 
@@ -804,13 +804,13 @@ if  __name__=='__main__':
 
 
 
-# if __name__ == "__main__":    
+# if __name__ == "__main__":
 #       import argparse
 #       parser = argparse.ArgumentParser()
 #       parser.add_argument("training_file", help=" File wiht trainning samples in microtc format")
 #       parser.add_argument("test_file", help="File  wiht  test samples in microtc format")
 #       parser.add_argument("-e", "--epsilon")
-    
+
 #       args = parser.parse_args()
 #       X,Y,d=load(args.training_file)
 #       eps=load(args.epsilon)
@@ -818,9 +818,9 @@ if  __name__=='__main__':
 
 
 
-    
 
-# if __name__ == "__main__":    
+
+# if __name__ == "__main__":
 #      import argparse
 #      parser = argparse.ArgumentParser()
 #      parser.add_argument("training_file", help=" File wiht trainning samples in microtc format")
@@ -837,4 +837,3 @@ if  __name__=='__main__':
 #          del Yr
 #          X,Y,d=load(args.training_file)
 #          test_svm(X+C,Y+Yc,args.test_file,'semeval/rocchio/semeval_english2007.predicte.json')
-    

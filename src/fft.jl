@@ -47,7 +47,7 @@ end
 
 function full_index(vbows, ind, config, num_fast_links)
     index, fastlinks=create_index(config, cosine)
-    for i  in ind
+    for i in ind
         vbow=vbows[i]
         knn, N = find_neighborhood(index, vbow)
         push_neighborhood!(index, vbow, N, length(index.db))
@@ -225,7 +225,7 @@ function  apply_selection(vbows, centers, partitions,ind,selection,index,findex,
         vbow=vbows[fnid]
         knn, N = find_neighborhood(index,vbow)
         push_neighborhood!(index, vbow, N, length(index.db))
-        update_oracle(index, fastlinks, vbow, length(centers)>7 ? 7 : length(centers))
+        update_oracle(index, fastlinks, vbow, length(centers) > 7 ? 7 : length(centers))
     else
         fnid,d=selection_functions[selection](vbows, centers, partitions,ind)
     end
@@ -237,24 +237,24 @@ function approx_maxmin(vbows,centers,ind,index,findex)
     #println(">>>>>> Length: ", length(index.db))
     #println(centers)
     if length(centers)==1
-        kfn, N = find_neighborhood(findex, vbows[centers[1]])
+        kfn = search(findex, vbows[centers[1]])
         res[first(kfn).objID]=-first(kfn).dist
     else
         for c in centers
-        #c=last(centers)
-            kfn, Nf = find_neighborhood(findex, vbows[c])
-            println("================",Nf,"  ",length(kfn))
+        # c=last(centers)
+            kfn = search(findex, vbows[c])
+            # println("================",Nf,"  ",length(kfn))
             for fn in kfn
                 if !(ind[fn.objID] in centers)
-                    knn, N = find_neighborhood(index, vbows[ind[fn.objID]])
+                    knn = search(index, vbows[ind[fn.objID]])
                     for nn in knn
-                        k,dist=nn.objID,nn.dist
+                        k, dist = nn.objID, nn.dist
                         if k in keys(res)
-                            res[k] = abs(res[k])<dist ? res[k] : -dist 
+                            res[k] = abs(res[k]) < dist ? res[k] : -dist
                         else
-                            res[k]=-dist            
+                            res[k] = -dist
                         end
-                    end    
+                    end
                 end
             end
         end
