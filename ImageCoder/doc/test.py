@@ -5,6 +5,7 @@ from sklearn import svm
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score as accs
 from sklearn.metrics import f1_score as f1
+from sklearn.metrics import precision_score as precision
 from sklearn.metrics import recall_score as recall
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import cohen_kappa_score as kappa
@@ -47,7 +48,7 @@ def test_classifiers(X,y,n=7,rname="results.txt"):
     clfs={
 #        "Bagging KNN": [BaggingClassifier(KNeighborsClassifier(),max_samples=0.5, max_features=0.5),[],[],[],[]],
         "NN (kNN k=1)": [KNeighborsClassifier(n_neighbors=1),[],[],[],[],[]],
-        "NN (kNN k=3)": [KNeighborsClassifier(n_neighbors=3),[],[],[],[],[]],
+        #"NN (kNN k=3)": [KNeighborsClassifier(n_neighbors=3),[],[],[],[],[]],
         "NN (kNN k=3 w)": [KNeighborsClassifier(n_neighbors=3, weights='distance'),[],[],[],[],[]],
         "NN (kNN k=5 w)": [KNeighborsClassifier(n_neighbors=5, weights='distance'),[],[],[],[],[]],
         #"NN (kNN k=7 w)": [KNeighborsClassifier(n_neighbors=7, weights='distance'),[],[],[],[]],
@@ -56,7 +57,7 @@ def test_classifiers(X,y,n=7,rname="results.txt"):
 #        "SVM Sigmoide": [svm.SVC(kernel="sigmoid"),[],[],[],[]],
         #"ANN":[MLPClassifier(solver='lbfgs', alpha=1e-5,hidden_layer_sizes=(5, 2), random_state=1),[],[],[],[]],
     }
-    V=["Voting KNN",[None,[],[],[],[]]]
+    #V=["Voting KNN",[None,[],[],[],[]]]
     skf=kfold(y, n_iter=n, random_state=None,  train_size=0.7)
     output=open(rname,"w")
     for train,test in skf:
@@ -71,15 +72,17 @@ def test_classifiers(X,y,n=7,rname="results.txt"):
             v[1].append(accs(Yv,Yr))
             v[2].append(f1(Yv,Yr,average="macro"))
             v[3].append(recall(Yv,Yr,average="macro"))
-            v[4].append(f1(Yv,Yr,average="micro"))
+            v[4].append(precision(Yv,Yr))
             v[5].append(kappa(Yv,Yr))
             #votes.append(Yr)
         #Yp=predict(votes)
     for k,v in clfs.items():
         fm="%s | %s| %s | %s | %s\n"
         output.write(fm %(k,"Accuracy",np.mean(v[1]),min(v[1]),max(v[1])))
-        output.write(fm  %(k,"Kappa",np.mean(v[5]),min(v[5]),max(v[5])))
-        #output.write(fm %(k,"Recall",np.mean(v[3]),min(v[3]),max(v[3])))
+        #output.write(fm  %(k,"Kappa",np.mean(v[5]),min(v[5]),max(v[5])))
+        output.write(fm %(k,"F1",np.mean(v[2]),min(v[2]),max(v[2])))
+        output.write(fm %(k,"Recall",np.mean(v[3]),min(v[3]),max(v[3])))
+        output.write(fm %(k,"Precision",np.mean(v[4]),min(v[4]),max(v[4])))
 
 
 def make_precictions(X,y,T,yT=[],rname="predictions.txt"):        
@@ -99,16 +102,21 @@ if __name__ == "__main__":
     fname=sys.argv[1]
     tname=sys.argv[2]
     testing=sys.argv[3]
+    print("VVVVVVVVVVVVVVVVVVVVVVVVVVV")
+    print(fname)
+    print(tname)
+    print(testing)
     #rname=sys.argv[4]
-    data=load(fname)
+    X=load(fname)
     #X=data[:,:-1]
-    X=data[:20000,:]
-    y=load("labels.csv")
+    #X=data[:20000,:]
+    y=load("labels.all.csv")
     #y=data[:,-1]    
     T=load(tname)
+    print("$$$$$$$$$$$$$$$$$$$",X.shape, T.shape, len(y))
     #print(len(T))
     #print(len(X[1]))
     #print(len(T[1]))
-    make_precictions(X,y,T)
-    test_classifiers(X,y,7,testing)
+    #make_precictions(X,y,T)
+    test_classifiers(X,y,10,testing)
 

@@ -23,7 +23,6 @@ function main(filename,labels,dst,num_of_centers,kernel,codebook,distance_functi
     kf=Kernels[kernel]
     ws=string(split_index,"N",weight)
     suffix="$num_of_centers.$dst.$kernel.$distance_function.$ws"
-    println(suffix)
     if codebook==nothing
         #centers,dists,partitions=fft(vbows,Y,num_of_centers, distance_function=df)
         centers,dists,partitions=fft(X1,Y1,num_of_centers, distance_function=df)
@@ -35,12 +34,17 @@ function main(filename,labels,dst,num_of_centers,kernel,codebook,distance_functi
          Xm,Xc,dists=data["centroids"],data["centers"],data["dists"]
     end
     #nc=Int64(length(Xm)/2)
-    dd=last(dists)
+    dd=last(dists) 
     sigmas=Dict(0=>dd*dd, 1=>dd*dd)
     #l=hcat([0 for i in 1:nc],[1 for i in 1:nc])
     l=Y
     #Xrm=gen_features(vbows,Xm[nc+1:2*nc],sigmas,l,kernel=kf)
     #Xrc=gen_features(vbows,Xc[nc+1:2*nc],sigmas,l,kernel=kf)
+    println(suffix)
+    println("Start dist: ", first(dists))
+    println("Optimal dist: ", last(dists))
+    println("Mean dists: ", mean(dists))
+    println("Diff dist: ", first(dists)-last(dists))
     Xrm=gen_features(vbows,Xm,sigmas,l,kernel=kf)
     Xrc=gen_features(vbows,Xc,sigmas,l,kernel=kf)
     println(length(Xrm),"   ", length(Xrc), " ", length(Xrm[1]))

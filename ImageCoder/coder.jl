@@ -159,7 +159,7 @@ function fft(vbows,clases,num_of_centers; distance_function=L2Distance())
         index=KnnResult(length(ind))
         partitions[ind[s]]=ind[s]
         k=1
-        while  k<noc && k<=length(ind)
+        while  k<=noc && k<=length(ind)
             fnid,d=maxmin(vbows,centers,ind,index,distance_function,partitions)
             push!(centers,fnid)
             push!(dists,d)
